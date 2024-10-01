@@ -1,6 +1,7 @@
 package home.project.repository;
 
 
+import home.project.domain.Category;
 import home.project.domain.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,21 +18,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     @Query("SELECT p FROM Product p WHERE " +
             "(:brand IS NULL OR :brand = '' OR LOWER(p.brand) LIKE LOWER(CONCAT('%', :brand, '%'))) AND " +
-            "(:category IS NULL OR :category = '' OR LOWER(p.category) LIKE LOWER(CONCAT('%', :category, '%'))) AND " +
+            "(:categoryCode IS NULL OR :categoryCode = '' OR LOWER(p.category.code) LIKE LOWER(CONCAT('%', :categoryCode, '%'))) AND " +
             "(:productName IS NULL OR :productName = '' OR LOWER(p.name) LIKE LOWER(CONCAT('%', :productName, '%'))) AND " +
             "(:content IS NULL OR :content = '' OR " +
-            "LOWER(CONCAT(p.brand, ' ', p.category, ' ', p.name)) LIKE LOWER(CONCAT('%', :content, '%')))")
+            "LOWER(CONCAT(p.brand, ' ', p.category.code, ' ', p.name)) LIKE LOWER(CONCAT('%', :content, '%')))")
     Page<Product> findProducts(@Param("brand") String brand,
-                               @Param("category") String category,
+                               @Param("categoryCode") String categoryCode,
                                @Param("productName") String productName,
                                @Param("content") String content,
                                Pageable pageable);
 
     boolean existsByProductNum(String productNum);
 
-    List<Product> findAllByCategory(String category);
+    List<Product> findAllByCategory(Category category);
 
-    List<Product> findAllByCategoryStartingWith(String category);
+    List<Product> findAllByCategoryCodeStartingWith(String category);
 
 
 

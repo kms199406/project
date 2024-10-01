@@ -135,40 +135,49 @@ public class CategoryServiceImpl implements CategoryService {
         for (Category category : categoriesToUpdate) {
             String oldCategoryCode = category.getCode();
             String newCategoryCode;
-
             if (oldCategoryCode.equals(oldCode)) {
                 newCategoryCode = newCode;
             } else {
                 newCategoryCode = newCode + oldCategoryCode.substring(oldCode.length());
             }
-
             category.setCode(newCategoryCode);
 
-            List<Product> categoryProducts = productRepository.findAllByCategory(oldCategoryCode);
+            // 해당 카테고리에 속한 모든 제품 업데이트
+            List<Product> categoryProducts = productRepository.findAllByCategory(category);
             for (Product product : categoryProducts) {
-                product.setCategory(newCategoryCode);
+                updateProductCategoryAndNum(product, category, oldCategoryCode, newCategoryCode);
                 productsToUpdate.add(product);
             }
         }
 
-        List<Product> subCategoryProducts = productRepository.findAllByCategoryStartingWith(oldCode);
+        // 하위 카테고리에 속한 제품들 중 아직 업데이트되지 않은 제품 처리
+        List<Product> subCategoryProducts = productRepository.findAllByCategoryCodeStartingWith(oldCode);
         for (Product product : subCategoryProducts) {
             if (!productsToUpdate.contains(product)) {
-                String oldProductCategory = product.getCategory();
-                String newProductCategory = newCode + oldProductCategory.substring(oldCode.length());
-                product.setCategory(newProductCategory);
-
-                String oldProductNum = product.getProductNum();
-                String newProductNum = oldProductNum.replace(oldProductCategory, newProductCategory);
-                product.setProductNum(newProductNum);
-
+                Category newCategory = findNewCategory(categoriesToUpdate, product.getCategory().getCode());
+                updateProductCategoryAndNum(product, newCategory, product.getCategory().getCode(), newCategory.getCode());
                 productsToUpdate.add(product);
             }
-
         }
 
         categoryRepository.saveAll(categoriesToUpdate);
         productRepository.saveAll(productsToUpdate);
+    }
+
+    private void updateProductCategoryAndNum(Product product, Category newCategory, String oldCategoryCode, String newCategoryCode) {
+        product.setCategory(newCategory);
+        String oldProductNum = product.getProductNum();
+        String newProductNum = oldProductNum.replace(oldCategoryCode, newCategoryCode);
+        product.setProductNum(newProductNum);
+    }
+
+    private Category findNewCategory(List<Category> updatedCategories, String oldCategoryCode) {
+        for (Category category : updatedCategories) {
+            if (category.getCode().endsWith(oldCategoryCode.substring(oldCategoryCode.lastIndexOf('-') + 1))) {
+                return category;
+            }
+        }
+        throw new IllegalStateException("새로운 카테고리를 찾을 수 없습니다: " + oldCategoryCode);
     }
 
     @Transactional

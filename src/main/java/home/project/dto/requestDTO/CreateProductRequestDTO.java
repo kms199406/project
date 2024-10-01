@@ -1,5 +1,6 @@
 package home.project.dto.requestDTO;
 
+import home.project.domain.Category;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -32,8 +33,8 @@ public class CreateProductRequestDTO {
      * 상품의 카테고리입니다.
      * 이 필드는 비어있거나 null이 될 수 없습니다.
      */
-    @NotBlank(message = "상품의 카테고리를 입력해주세요.")
-    private String category;
+    @NotBlank(message = "상품의 카테고리코드를 입력해주세요.")
+    private Category categoryCode;
 
     /**
      * 상품의 판매 수량입니다.

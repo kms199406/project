@@ -44,8 +44,8 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = new Product();
         product.setBrand(createProductRequestDTO.getBrand());
-        product.setCategory(createProductRequestDTO.getCategory());
-        product.setProductNum(timeStamp + createProductRequestDTO.getBrand().charAt(0) + createProductRequestDTO.getName().charAt(0) + createProductRequestDTO.getCategory().toString());
+        product.setCategory(createProductRequestDTO.getCategoryCode());
+        product.setProductNum(timeStamp + createProductRequestDTO.getBrand().charAt(0) + createProductRequestDTO.getName().charAt(0) + createProductRequestDTO.getCategoryCode().toString());
         product.setSoldQuantity(createProductRequestDTO.getSoldQuantity());
         product.setName(createProductRequestDTO.getName());
         product.setStock(createProductRequestDTO.getStock());
@@ -145,8 +145,8 @@ public class ProductServiceImpl implements ProductService {
             existingProduct.setBrand(updateProductRequestDTO.getBrand());
         }
 
-        if (updateProductRequestDTO.getCategory() != null) {
-            existingProduct.setCategory(updateProductRequestDTO.getCategory());
+        if (updateProductRequestDTO.getCategoryCode() != null) {
+            existingProduct.setCategory(updateProductRequestDTO.getCategoryCode());
         }
 
         if (existingProduct.equals(beforeUpdate)) {
